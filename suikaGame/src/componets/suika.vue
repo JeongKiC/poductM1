@@ -22,6 +22,8 @@ const victory = ref(false)
 
 onMounted(() => {
 
+  document.title = 'Home'
+
   engine = Engine.create()
   runner = Runner.create()
   render = Render.create({
