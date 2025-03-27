@@ -10,32 +10,36 @@
       <nav>
         <ul class="ul mt-20 mb-20 h-400">
           <li class="li">
-            <a>Home</a>
+            <a href="#" @click.prevent="pageStore.setViewName('Suika')">Suika</a>
           </li>
           <li class="li">
-            <a>Rank</a>
+            <a href="#" @click.prevent="pageStore.setViewName('Timer')">Timer</a>
           </li>
         </ul>
       </nav>
     </aside>
-    <div class="flex mt-20 md:mt-10 md:flex-row p-5 transition-all duration-300">
-      <Suika />
+    <div class="flex-1 h-[calc(100vh-60px)] mt-20 md:mt-10 md:flex-row p-5 transition-all duration-300">
+      <Component :is="componentMap[pageStore.getViewName()]" />
     </div>
   </div>
 </template>
 
 <script setup>
 import Suika from './componets/suika.vue'
-import { ref, onMounted } from 'vue'
-import {usePageStore} from './stores/pages.js'
+import Timer from './componets/timer.vue'
+import { ref, onMounted, computed } from 'vue'
+import { usePageStore } from './stores/pages.js'
 
 const pageStore = usePageStore()
-const page = ref(pageStore.getViewName())
+
+const componentMap = {
+  Suika,
+  Timer
+}
 
 
 onMounted(() => {
 
-console.log('page', pageStore)
   document.title = 'Home'
 
   const menuBtn = document.getElementById('menu-btn')
@@ -56,6 +60,7 @@ console.log('page', pageStore)
 </script>
 <style>
 @import "tailwindcss";
+
 .ul .li {
   padding: 10px;
 }

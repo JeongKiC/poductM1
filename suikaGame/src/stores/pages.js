@@ -3,12 +3,14 @@ import { ref } from 'vue'
 
 export const usePageStore = defineStore("Page", ()=>{
   const score = ref(0)
-  const viewName = ref("")
+  const viewName = ref("Timer")
 
   const setScore = (newScore) => {
+    console.log("setScore: ", newScore)
     score.value = newScore
   }
   const setViewName = (newViewName) => {
+    console.log("setViewName: ", newViewName)
     viewName.value = newViewName
   }
   const getScore = () => {
@@ -18,6 +20,6 @@ export const usePageStore = defineStore("Page", ()=>{
     return viewName.value
   }
 
-  return {score, viewName, setScore, setViewName, getScore, getViewName}
+  return {viewName,setScore, setViewName, getScore, getViewName}
 
 })
