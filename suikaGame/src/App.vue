@@ -22,6 +22,7 @@
       <Component :is="componentMap[pageStore.getViewName()]" />
     </div>
   </div>
+
 </template>
 
 <script setup>
