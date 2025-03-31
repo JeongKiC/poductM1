@@ -107,26 +107,22 @@ onUnmounted(() => {
 
 const audioSrc = "/Beep.mp4"; // 알람 효과음 파일 경로
 const audio = ref(null);
-const audioVolume = ref(0.3); // 볼륨 조절 (0.0 ~ 1.0)
+const audioVolume = ref(0.3); // 볼륨 조절 추후 조절 업데이트
 // 알람 효과음 함수
 function doneSound() {
   audio.value = new Audio(audioSrc);
-  audio.value.volume = audioVolume.value; // 볼륨 조절 (0.0 ~ 1.0)
+  audio.value.volume = audioVolume.value; // 볼륨 조절 추후 조절 업데이트
   audio.value.play().catch((error) => {
     console.error("Audio play failed:", error);
   });
 }
+
 const updateVolume = (newVolume) => {
   audioVolume.value = newVolume;
   if (audio.value) {
     audio.value.volume = newVolume // 볼륨 조절 (0.0 ~ 1.0);
   }
 };
-onMounted(()=>{
-  // 초기화 시 알람 효과음 재생
-  doneSound();
-})
-
 
 </script>
 
