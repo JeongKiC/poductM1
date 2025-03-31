@@ -1,0 +1,14 @@
+{
+  "manifest_version": 3,
+  "name": "Timer Extension",
+  "version": "1.0",
+  "description": "simple timer extension",
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "/timerImage16.png",
+      "48": "/timerImage48.png",
+      "128": "/timerImage128.png"
+    }
+  }
+}
