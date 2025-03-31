@@ -10,5 +10,14 @@
       "48": "/timerImage48.png",
       "128": "/timerImage128.png"
     }
+  },
+  "permissions": ["storage", "notifications"],
+    "background": {
+        "service_worker": "background.js"
+    },
+  "icons": {
+    "16": "/timerImage16.png",
+    "48": "/timerImage48.png",
+    "128": "/timerImage128.png"
   }
 }
