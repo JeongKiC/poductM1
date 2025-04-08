@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>매직 코인 - 블록체인 암호화폐</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .block {
+      transition: all 0.3s ease;
+    }
+    .block:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto px-4 py-8">
+    <header class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-purple-700 mb-2">매직 코인</h1>
+      <p class="text-xl text-gray-600">블록체인 기반 암호화폐</p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- 트랜잭션 섹션 -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold mb-4 text-purple-600">새 트랜잭션</h2>
+        <div class="mb-4">
+          <label for="fromAddress" class="block text-gray-700 mb-2">송신자 주소</label>
+          <input id="fromAddress" class="w-full p-2 border border-gray-300 rounded-md" placeholder="송신자 주소를 입력하세요...">
+        </div>
+        <div class="mb-4">
+          <label for="toAddress" class="block text-gray-700 mb-2">수신자 주소</label>
+          <input id="toAddress" class="w-full p-2 border border-gray-300 rounded-md" placeholder="수신자 주소를 입력하세요...">
+        </div>
+        <div class="mb-4">
+          <label for="amount" class="block text-gray-700 mb-2">금액</label>
+          <input id="amount" type="number" class="w-full p-2 border border-gray-300 rounded-md" placeholder="전송할 금액을 입력하세요...">
+        </div>
+        <button id="sendBtn" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
+          전송
+        </button>
+        <div id="transactionResult" class="mt-4 p-4 bg-gray-100 rounded-md hidden">
+          <h3 class="font-semibold mb-2">트랜잭션 결과:</h3>
+          <pre id="transactionData" class="text-sm overflow-x-auto"></pre>
+        </div>
+      </div>
+
+      <!-- 채굴 섹션 -->
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold mb-4 text-purple-600">블록 채굴</h2>
+        <div class="mb-4">
+          <label for="miningAddress" class="block text-gray-700 mb-2">채굴 보상 주소</label>
+          <input id="miningAddress" class="w-full p-2 border border-gray-300 rounded-md" placeholder="채굴 보상을 받을 주소를 입력하세요...">
+        </div>
+        <button id="mineBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+          블록 채굴
+        </button>
+        <div id="miningResult" class="mt-4 p-4 bg-gray-100 rounded-md hidden">
+          <h3 class="font-semibold mb-2">채굴 결과:</h3>
+          <pre id="miningData" class="text-sm overflow-x-auto"></pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- 잔액 확인 섹션 -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-4 text-purple-600">잔액 확인</h2>
+      <div class="flex flex-col md:flex-row gap-4">
+        <div class="flex-grow">
+          <label for="balanceAddress" class="block text-gray-700 mb-2">주소</label>
+          <input id="balanceAddress" class="w-full p-2 border border-gray-300 rounded-md" placeholder="잔액을 확인할 주소를 입력하세요...">
+        </div>
+        <div class="flex items-end">
+          <button id="checkBalanceBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
+            잔액 확인
+          </button>
+        </div>
+      </div>
+      <div id="balanceResult" class="mt-4 p-4 bg-gray-100 rounded-md hidden">
+        <h3 class="font-semibold mb-2">잔액 정보:</h3>
+        <p id="balanceData" class="text-lg font-bold text-purple-700"></p>
+      </div>
+    </div>
+
+    <!-- 블록체인 상태 섹션 -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-4 text-purple-600">블록체인 상태</h2>
+      <div class="mb-4">
+        <p class="text-gray-700">블록 수: <span id="blockCount" class="font-semibold">0</span></p>
+        <p class="text-gray-700">유효성: <span id="chainValid" class="font-semibold">-</span></p>
+        <p class="text-gray-700">대기 중인 트랜잭션: <span id="pendingTxCount" class="font-semibold">0</span></p>
+      </div>
+      <button id="refreshBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
+        상태 새로고침
+      </button>
+    </div>
+
+    <!-- 블록 목록 섹션 -->
+    <div class="mt-8 bg-white rounded-lg shadow-md p-6">
+      <h2 class="text-2xl font-semibold mb-4 text-purple-600">블록 목록</h2>
+      <div id="blockList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- 블록들이 여기에 동적으로 추가됩니다 -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // DOM 요소
+    const fromAddressInput = document.getElementById('fromAddress');
+    const toAddressInput = document.getElementById('toAddress');
+    const amountInput = document.getElementById('amount');
+    const sendBtn = document.getElementById('sendBtn');
+    const transactionResult = document.getElementById('transactionResult');
+    const transactionData = document.getElementById('transactionData');
+    
+    const miningAddressInput = document.getElementById('miningAddress');
+    const mineBtn = document.getElementById('mineBtn');
+    const miningResult = document.getElementById('miningResult');
+    const miningData = document.getElementById('miningData');
+    
+    const balanceAddressInput = document.getElementById('balanceAddress');
+    const checkBalanceBtn = document.getElementById('checkBalanceBtn');
+    const balanceResult = document.getElementById('balanceResult');
+    const balanceData = document.getElementById('balanceData');
+    
+    const refreshBtn = document.getElementById('refreshBtn');
+    const blockCount = document.getElementById('blockCount');
+    const chainValid = document.getElementById('chainValid');
+    const pendingTxCount = document.getElementById('pendingTxCount');
+    const blockList = document.getElementById('blockList');
+
+    // 블록체인 상태 새로고침
+    function refreshBlockchain() {
+      fetch('/api/blockchain')
+        .then(response => response.json())
+        .then(data => {
+          blockCount.textContent = data.chain.length;
+          chainValid.textContent = data.isValid ? '유효함' : '유효하지 않음';
+          chainValid.className = data.isValid ? 'font-semibold text-green-600' : 'font-semibold text-red-600';
+          pendingTxCount.textContent = data.pendingTransactions.length;
+          
+          // 블록 목록 업데이트
+          updateBlockList(data.chain);
+        })
+        .catch(error => {
+          console.error('블록체인 상태 가져오기 오류:', error);
+        });
+    }
+
+    // 블록 목록 업데이트
+    function updateBlockList(chain) {
+      blockList.innerHTML = '';
+      
+      chain.forEach((block, index) => {
+        const blockElement = document.createElement('div');
+        blockElement.className = 'block bg-gray-50 p-4 rounded-lg border border-gray-200';
+        
+        const timestamp = new Date(block.timestamp).toLocaleString();
+        const hashShort = block.hash.substring(0, 10) + '...';
+        const prevHashShort = block.previousHash.substring(0, 10) + '...';
+        
+        let transactionsContent = '제네시스 블록';
+        if (index > 0 && block.transactions.length > 0) {
+          transactionsContent = `${block.transactions.length}개의 트랜잭션`;
+        }
+        
+        blockElement.innerHTML = `
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-bold text-purple-700">블록 #${index}</h3>
+            <span class="text-xs text-gray-500">${timestamp}</span>
+          </div>
+          <div class="text-sm mb-2">
+            <p class="mb-1"><span class="font-semibold">해시:</span> ${hashShort}</p>
+            <p class="mb-1"><span class="font-semibold">이전 해시:</span> ${prevHashShort}</p>
+            <p class="mb-1"><span class="font-semibold">트랜잭션:</span> ${transactionsContent}</p>
+          </div>
+          <div class="flex justify-between mt-2">
+            <button class="text-xs bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition-colors" 
+                    onclick="viewTransactions(${index})">
+              트랜잭션 보기
+            </button>
+            <span class="text-xs text-gray-500">Nonce: ${block.nonce}</span>
+          </div>
+        `;
+        
+        blockList.appendChild(blockElement);
+      });
+    }
+
+    // 트랜잭션 보기
+    function viewTransactions(blockIndex) {
+      fetch('/api/blockchain')
+        .then(response => response.json())
+        .then(data => {
+          const block = data.chain[blockIndex];
+          if (block.transactions.length === 0) {
+            alert('이 블록에는 트랜잭션이 없습니다.');
+            return;
+          }
+          
+          let transactionsText = '';
+          block.transactions.forEach((tx, i) => {
+            transactionsText += `트랜잭션 #${i+1}:\n`;
+            transactionsText += `  송신자: ${tx.fromAddress}\n`;
+            transactionsText += `  수신자: ${tx.toAddress}\n`;
+            transactionsText += `  금액: ${tx.amount}\n`;
+            transactionsText += `  시간: ${new Date(tx.timestamp).toLocaleString()}\n\n`;
+          });
+          
+          alert(transactionsText);
+        })
+        .catch(error => {
+          console.error('트랜잭션 정보 가져오기 오류:', error);
+        });
+    }
+
+    // 트랜잭션 전송
+    sendBtn.addEventListener('click', () => {
+      const fromAddress = fromAddressInput.value.trim();
+      const toAddress = toAddressInput.value.trim();
+      const amount = parseFloat(amountInput.value);
+      
+      if (!fromAddress || !toAddress || isNaN(amount) || amount <= 0) {
+        alert('모든 필드를 올바르게 입력하세요.');
+        return;
+      }
+      
+      fetch('/api/transaction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fromAddress, toAddress, amount })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        transactionResult.classList.remove('hidden');
+        transactionData.textContent = JSON.stringify(data.transaction, null, 2);
+        
+        fromAddressInput.value = '';
+        toAddressInput.value = '';
+        amountInput.value = '';
+        
+        // 블록체인 상태 새로고침
+        refreshBlockchain();
+      })
+      .catch(error => {
+        console.error('트랜잭션 오류:', error);
+        alert('트랜잭션 처리 중 오류가 발생했습니다.');
+      });
+    });
+
+    // 블록 채굴
+    mineBtn.addEventListener('click', () => {
+      const miningAddress = miningAddressInput.value.trim();
+      
+      if (!miningAddress) {
+        alert('채굴 보상 주소를 입력하세요.');
+        return;
+      }
+      
+      fetch('/api/mine', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ miningRewardAddress: miningAddress })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          alert(data.error);
+          return;
+        }
+        
+        miningResult.classList.remove('hidden');
+        miningData.textContent = JSON.stringify(data.block, null, 2);
+        
+        // 블록체인 상태 새로고침
+        refreshBlockchain();
+      })
+      .catch(error => {
+        console.error('채굴 오류:', error);
+        alert('채굴 중 오류가 발생했습니다.');
+      });
+    });
+
+    // 잔액 확인
+    checkBalanceBtn.addEventListener('click', () => {
+      const address = balanceAddressInput.value.trim();
+      
+      if (!address) {
+        alert('주소를 입력하세요.');
+        return;
+      }
+      
+      fetch(`/api/balance/${address}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            alert(data.error);
+            return;
+          }
+          
+          balanceResult.classList.remove('hidden');
+          balanceData.textContent = `${data.balance} 매직 코인`;
+        })
+        .catch(error => {
+          console.error('잔액 확인 오류:', error);
+          alert('잔액 확인 중 오류가 발생했습니다.');
+        });
+    });
+
+    // 새로고침 버튼 이벤트
+    refreshBtn.addEventListener('click', refreshBlockchain);
+
+    // 초기 로드
+    refreshBlockchain();
+  </script>
+</body>
+</html> 
