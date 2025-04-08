@@ -1,0 +1,22 @@
+{
+  "name": "magic-claw",
+  "version": "1.0.0",
+  "description": "블록체인 기반 암호화 시스템",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "blockchain",
+    "encryption",
+    "cryptography"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2"
+  }
+} 
