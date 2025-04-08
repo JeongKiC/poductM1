@@ -83,7 +83,7 @@ function resetTimer() {
   // 팝업에 상태 전달
   chrome.runtime.sendMessage({
     type: 'timerUpdate',
-    timeLeft: 0,
+    timeLeft: -1,
     isRunning: false
   });
 }
